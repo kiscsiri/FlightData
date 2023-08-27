@@ -5,6 +5,10 @@ VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightData", "FlightData.csproj", "{D7100F10-E146-4329-AE02-7A68C4BFDDAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightData.Model", "..\FlightData.Model\FlightData.Model.csproj", "{57529C7B-AAFA-4101-AB58-9F7FEBA31F7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightData.DAL", "..\FlightData.DAL\FlightData.DAL.csproj", "{3CB72961-0E49-4BC4-8971-F24BC34818C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{D7100F10-E146-4329-AE02-7A68C4BFDDAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7100F10-E146-4329-AE02-7A68C4BFDDAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7100F10-E146-4329-AE02-7A68C4BFDDAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57529C7B-AAFA-4101-AB58-9F7FEBA31F7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57529C7B-AAFA-4101-AB58-9F7FEBA31F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57529C7B-AAFA-4101-AB58-9F7FEBA31F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57529C7B-AAFA-4101-AB58-9F7FEBA31F7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CB72961-0E49-4BC4-8971-F24BC34818C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CB72961-0E49-4BC4-8971-F24BC34818C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CB72961-0E49-4BC4-8971-F24BC34818C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CB72961-0E49-4BC4-8971-F24BC34818C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

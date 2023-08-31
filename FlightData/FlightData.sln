@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightData.Model", "..\Flig
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightData.DAL", "..\FlightData.DAL\FlightData.DAL.csproj", "{3CB72961-0E49-4BC4-8971-F24BC34818C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightData.BLL", "..\FlightData.BLL\FlightData.BLL.csproj", "{135F2788-52A8-44C6-86A3-E4645E01268E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightData.BLL", "..\FlightData.BLL\FlightData.BLL.csproj", "{135F2788-52A8-44C6-86A3-E4645E01268E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

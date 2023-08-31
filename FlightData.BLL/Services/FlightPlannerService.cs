@@ -7,12 +7,6 @@ using FlightData.Model.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace FlightData.BLL.Services
 {
     public class FlightPlannerService : IFlightPlannerService
@@ -20,61 +14,152 @@ namespace FlightData.BLL.Services
         private readonly FlightDataContext _flightDataContext;
         private readonly IMapper _mapper;
         private readonly IFlightServices _flightServices;
+        private readonly ICityServices _cityServices;
+        private readonly IAirlineServices _airlineServices;
 
         public FlightPlannerService(FlightDataContext flightDataContext,
             IMapper mapper,
-            IFlightServices flightServices)
+            IFlightServices flightServices,
+            ICityServices cityServices,
+            IAirlineServices airlineServices)
         {
             _flightDataContext = flightDataContext;
             _mapper = mapper;
             _flightServices = flightServices;
+            _cityServices = cityServices;
+            _airlineServices = airlineServices;
         }
 
-        public async Task<FlightDetailsDto> GetShortestRouteBetweenCitiesAsync(int startCityId, int destinationCityId)
+        public async Task<IEnumerable<FlightDetailsDto>> GetShortestRouteBetweenCitiesAsync(int startCityId, int destinationCityId, bool byAnyAirline)
         {
-            var startCity = await _flightDataContext.Cities.SingleOrDefaultAsync(c => c.Id == startCityId);
+            var startCity = await _flightDataContext.Cities
+                .Include(c => c.ArrivalFlights)
+                    .ThenInclude(f => f.StartCity)
+                 .Include(c => c.ArrivalFlights)
+                    .ThenInclude(f => f.Airline)
+                .Include(c => c.DepartureFlights)
+                    .ThenInclude(f => f.DestinationCity)                
+                .Include(c => c.DepartureFlights)
+                    .ThenInclude(f => f.Airline)
+                .SingleOrDefaultAsync(c => c.Id == startCityId);
 
             if (startCity == null)
             {
                 throw new InvalidOperationException($"Can't find city with Id: [{startCityId}]");
             }
 
-            var destCity = await _flightDataContext.Cities.SingleOrDefaultAsync(c => c.Id == destinationCityId);
+            var destCity = await _flightDataContext.Cities
+                .Include(c => c.ArrivalFlights)
+                    .ThenInclude(f => f.StartCity)
+                .Include(c => c.DepartureFlights)
+                    .ThenInclude(f => f.DestinationCity)
+                .SingleOrDefaultAsync(c => c.Id == destinationCityId);
 
             if (destCity == null)
             {
                 throw new InvalidOperationException($"Can't find city with Id: [{destinationCityId}]");
             }
 
-            var flights = await _flightServices.GetFlightsByCityAsync(startCityId, destinationCityId);
+            var allFlights = await _flightServices.GetFlightsAsync();
+            var cities = await _cityServices.GetCitiesAsync();
+            var airlines = await _airlineServices.GetAirlinesAsync();
 
-            if (flights.Any())
+            List<FlightDetailsDto> details = new();
+
+            if (!byAnyAirline)
             {
-                var shortestRoute = flights.OrderBy(f => f.Distance).FirstOrDefault();
-
-                return new FlightDetailsDto
+                foreach (var airline in airlines)
                 {
-                    Airline = shortestRoute.Airline,
-                    Flights = new List<GetFlightsDto>() { shortestRoute },
-                    TotalTime = TimeHelpers.CalculateDifference(shortestRoute.TakeOffDate, shortestRoute.ArrivalDate)
-                };
+                    var result = ConstructFlightRoute(cities.Where(c => c.ArrivalFlights.Any() || c.DepartureFlights.Any()), startCity, destCity, airline);
+
+                    if (result != null)
+                    {
+                        details.Add(result);
+                    }
+                }
             }
             else
             {
-                return await ConstructFlightRoute(startCity, destCity);
+                var result = ConstructFlightRoute(cities.Where(c => c.ArrivalFlights.Any() || c.DepartureFlights.Any()), startCity, destCity, null);
+
+                if (result != null)
+                {
+                    details.Add(result);
+                }
             }
+
+            return details;
         }
 
-        private async Task<FlightDetailsDto> ConstructFlightRoute(City startCity, City destCity)
+        private FlightDetailsDto ConstructFlightRoute(IEnumerable<City> cities, City startCity, City destCity, Airline? airline)
         {
-            var startFlights = await _flightServices.GetFlightsByCityAsync(startCity.Id, null);
+            var currentCity = startCity;
+            var visitedCityIds = new HashSet<int>();
+            var unvisitedCities = cities.ToHashSet();
 
-            foreach (var flight in startFlights.OrderBy(f => f.Distance))
+            // Key marks the city id, and the value is the shortest path generated from startCity
+            IDictionary<int, FlightDetailsDto> shortestFlightRoutesFromStart = new Dictionary<int, FlightDetailsDto>()
             {
-                
+                { startCity.Id, new FlightDetailsDto { Airline = airline} }
+            };
+
+            FlightDetailsDto? currentCityShortestFlightDetails = new();
+
+            while (unvisitedCities.Any())
+            {
+                // Check the current lowest distance city from the start city, then remove it from unvisited cities
+                var lowestDistanceCity = shortestFlightRoutesFromStart
+                    .Where(r => unvisitedCities.Select(c => c.Id).ToList().Contains(r.Key))
+                    .OrderBy(r => r.Value.TotalDistance)
+                    .FirstOrDefault();
+
+                currentCity = unvisitedCities.FirstOrDefault(c => c.Id == lowestDistanceCity.Key);
+
+                if (currentCity == null)
+                {
+                    break;
+                }
+
+                unvisitedCities.Remove(currentCity);
+
+                currentCityShortestFlightDetails = lowestDistanceCity.Value;
+                var lastFlightToCurrentCity = currentCityShortestFlightDetails.Flights.LastOrDefault();
+
+                // Get the list of unvisited city flight routes from the current city, ordered by distance,
+                // filtered to only get the flights in the future + 1 hour delay for the transfer
+                var unvisitedCityFlightsFromCurrentCity = currentCity.DepartureFlights
+                    .Where(df => unvisitedCities.Contains(df.DestinationCity) && df.TakeOffDate > (lastFlightToCurrentCity?.ArrivalDate.AddHours(1) ?? DateTime.Now))
+                    .OrderBy(d => d.Distance)
+                    .ToList();
+
+                if (airline != null)
+                {
+                    unvisitedCityFlightsFromCurrentCity = unvisitedCityFlightsFromCurrentCity.Where(f => f.AirlineId == airline.Id).ToList();
+                }
+
+                if (unvisitedCityFlightsFromCurrentCity != null && unvisitedCityFlightsFromCurrentCity.Any())
+                {
+                    foreach (var unvisitedCityFlight in unvisitedCityFlightsFromCurrentCity)
+                    {
+                        var currentShortestDistanceToCity = shortestFlightRoutesFromStart.TryGetValue(unvisitedCityFlight.DestinationCityId, out var shortestDistanceRoute);
+                        var newTotalDistance = currentCityShortestFlightDetails.TotalDistance + unvisitedCityFlight.Distance;
+
+                        if ((shortestDistanceRoute != null && newTotalDistance < shortestDistanceRoute.TotalDistance) || !currentShortestDistanceToCity)
+                        {
+                            var flightPlan = new FlightDetailsDto
+                            {
+                                Flights = currentCityShortestFlightDetails.Flights.ToList(),
+                                Airline = airline
+                            };
+
+                            flightPlan.Flights.Add(unvisitedCityFlight);
+                            shortestFlightRoutesFromStart[unvisitedCityFlight.DestinationCityId] = flightPlan;
+                        }
+                    }
+                }
             }
 
-            return new FlightDetailsDto();
+            return shortestFlightRoutesFromStart.TryGetValue(destCity.Id, out var result) ? result : new FlightDetailsDto { Airline = airline };
         }
     }
 }

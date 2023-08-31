@@ -1,10 +1,12 @@
 ﻿using FlightData.BLL.DTOs;
+using FlightData.Model.Entities;
 
 namespace FlightData.BLL.Interfaces
 {
     public interface ICityServices
     {
-        Task<GetCitiesDto> GetSmallestCityAsync();
-        Task<GetCitiesDto> GetBiggestCityAsync();
+        Task<City> GetSmallestCityAsync();
+        Task<City> GetBiggestCityAsync();
+        Task<IEnumerable<City>> GetCitiesAsync();
     }
 }

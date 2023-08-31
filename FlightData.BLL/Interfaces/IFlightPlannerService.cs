@@ -1,4 +1,5 @@
 ﻿using FlightData.BLL.DTOs;
+using FlightData.Model.Entities;
 
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace FlightData.BLL.Interfaces
 {
     public interface IFlightPlannerService
     {
-        Task<FlightDetailsDto> GetShortestRouteBetweenCitiesAsync(int startCityId, int destinationCityId);
+        Task<IEnumerable<FlightDetailsDto>> GetShortestRouteBetweenCitiesAsync(int startCityId, int destinationCityId, bool byAnyAirline);
     }
 }

@@ -1,17 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FlightData.Model.Entities;
 
 namespace FlightData.BLL.DTOs
 {
     public class FlightDetailsDto
     {
-        public GetAirlinesDto Airline { get; set; }
+        public Airline Airline { get; set; }
 
-        public IEnumerable<GetFlightsDto> Flights { get; set; }
+        public IList<Flight> Flights { get; set; } = new List<Flight>();
 
-        public TimeSpan? TotalTime { get; set; }
+        public string TotalTime
+        {
+            get
+            {
+                if (Flights.Any())
+                {
+                    return TimeHelpers.CalculateDifference(Flights.First().TakeOffDate, Flights.Last().ArrivalDate).ToHourMinuteFormat();
+                }
+
+                return "";
+            }
+        }
+
+        public double TotalDistance
+        {
+            get
+            {
+                return Flights.Sum(f => f.Distance);
+            }
+        }
     }
 }

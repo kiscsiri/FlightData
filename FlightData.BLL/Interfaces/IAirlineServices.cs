@@ -1,4 +1,5 @@
 ﻿using FlightData.BLL.DTOs;
+using FlightData.Model.Entities;
 
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace FlightData.BLL.Interfaces
 {
     public interface IAirlineServices
     {
-        Task<IEnumerable<GetAirlinesDto>> GetAirlinesAsync();
+        Task<IEnumerable<Airline>> GetAirlinesAsync();
         Task<IEnumerable<GetAirlinesDto>> GetFlightsForAirlineAsync(int id);
     }
 }

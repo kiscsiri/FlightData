@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
 
-using FlightData.BLL.DTOs;
 using FlightData.BLL.Interfaces;
 using FlightData.DAL;
+using FlightData.Model.Entities;
 
 using Microsoft.EntityFrameworkCore;
-
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FlightData.BLL.Services
 {
@@ -23,14 +19,16 @@ namespace FlightData.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GetFlightsDto>> GetFlightsAsync()
+        public async Task<IEnumerable<Flight>> GetFlightsAsync()
         {
-            var flights = await _flightDataContext.Flights.ToListAsync();
+            var flights = await _flightDataContext.Flights
+                .Include(f => f.Airline)
+                .ToListAsync();
 
-            return _mapper.Map<IEnumerable<GetFlightsDto>>(flights);
+            return flights;
         }
 
-        public async Task<IEnumerable<GetFlightsDto>> GetFlightsByCityAsync(int? fromCityId, int? toCityId)
+        public async Task<IEnumerable<Flight>> GetFlightsByCityAsync(int? fromCityId, int? toCityId)
         {
             var query = _flightDataContext.Flights.AsQueryable();
 
@@ -54,7 +52,7 @@ namespace FlightData.BLL.Services
 
             var flights = await query.ToListAsync();
 
-            return _mapper.Map<IEnumerable<GetFlightsDto>>(flights);
+            return flights;
         }
     }
 }

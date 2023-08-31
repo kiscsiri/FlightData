@@ -21,6 +21,7 @@ namespace FlightData.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(CityEntityTypeConfigration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(FlightEntityTypeConfiguration).Assembly);
         }
     }
 }

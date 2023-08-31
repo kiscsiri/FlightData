@@ -16,5 +16,15 @@
 
         public Airline Airline { get; set; }
         public int AirlineId { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj != null && ((Flight)obj)?.Id == Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
     }
 }

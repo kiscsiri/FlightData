@@ -9,5 +9,15 @@
         public ICollection<Flight> DepartureFlights { get; set; }
 
         public ICollection<Flight> ArrivalFlights { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj != null && ((City)obj)?.Id == Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
     }
 }

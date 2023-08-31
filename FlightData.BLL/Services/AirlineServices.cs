@@ -3,6 +3,7 @@
 using FlightData.BLL.DTOs;
 using FlightData.BLL.Interfaces;
 using FlightData.DAL;
+using FlightData.Model.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -25,11 +26,11 @@ namespace FlightData.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GetAirlinesDto>> GetAirlinesAsync()
+        public async Task<IEnumerable<Airline>> GetAirlinesAsync()
         {
             var airlines = await _flightDataContext.Airlines.ToListAsync();
             
-            return _mapper.Map<IEnumerable<GetAirlinesDto>>(airlines);
+            return airlines;
         }
 
         public async Task<IEnumerable<GetAirlinesDto>> GetFlightsForAirlineAsync(int airlineId)

@@ -10,6 +10,7 @@ namespace FlightData.BLL.DTOs
 {
     public class GetFlightsDto
     {
+        public int Id { get; set; }
         public double Distance { get; set; }
 
         public DateTimeOffset ArrivalDate { get; set; }

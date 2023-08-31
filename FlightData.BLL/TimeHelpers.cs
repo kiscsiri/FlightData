@@ -10,12 +10,12 @@ namespace FlightData.BLL
     {
         public static TimeSpan CalculateDifference(DateTimeOffset start, DateTimeOffset end)
         {
-            return start.Subtract(end);
+            return end.Subtract(start);
         }
 
         public static string ToHourMinuteFormat(this TimeSpan time)
         {
-            return (time.Hours != 0 ? $"{time.Hours} óra" : "") + (time.Minutes != 0 ? $"{time.Minutes} perc" : "");
+            return (time.Hours != 0 ? $"{time.Hours} óra" : "") + " " + (time.Minutes != 0 ? $"{time.Minutes} perc" : "");
         }
     }
 }

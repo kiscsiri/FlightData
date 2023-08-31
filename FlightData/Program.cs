@@ -32,9 +32,10 @@ var smallestCity = await cityServices.GetSmallestCityAsync();
 var biggestCity = await cityServices.GetBiggestCityAsync();
 
 var routesByAirlines = await flightPlannerService.GetShortestRouteBetweenCitiesAsync(smallestCity.Id, biggestCity.Id, false);
+
+Console.WriteLine(Environment.NewLine);
 Console.WriteLine($"Legkisebb város: {smallestCity.Name}, {smallestCity.Population} lakos");
 Console.WriteLine($"Legnagyobb város: {biggestCity.Name}, {biggestCity.Population} lakos");
-
 Console.WriteLine(Environment.NewLine);
 
 Console.WriteLine("A legrövidebb út:");

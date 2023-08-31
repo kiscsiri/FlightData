@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 
-using FlightData.BLL.DTOs;
 using FlightData.BLL.Interfaces;
 using FlightData.DAL;
 using FlightData.Model.Entities;

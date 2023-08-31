@@ -7,12 +7,6 @@ using FlightData.Model.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace FlightData.BLL.Services
 {
     public class AirlineServices : IAirlineServices
@@ -29,7 +23,7 @@ namespace FlightData.BLL.Services
         public async Task<IEnumerable<Airline>> GetAirlinesAsync()
         {
             var airlines = await _flightDataContext.Airlines.ToListAsync();
-            
+
             return airlines;
         }
 

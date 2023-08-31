@@ -2,7 +2,7 @@
 
 namespace FlightData.BLL.DTOs
 {
-    public class FlightDetailsDto
+    public class FlightDetails
     {
         public Airline Airline { get; set; }
 

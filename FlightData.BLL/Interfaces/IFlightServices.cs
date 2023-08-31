@@ -1,11 +1,4 @@
-﻿using FlightData.BLL.DTOs;
-using FlightData.Model.Entities;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FlightData.Model.Entities;
 
 namespace FlightData.BLL.Interfaces
 {

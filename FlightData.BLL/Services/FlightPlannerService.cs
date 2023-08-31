@@ -30,7 +30,7 @@ namespace FlightData.BLL.Services
             _airlineServices = airlineServices;
         }
 
-        public async Task<IEnumerable<FlightDetailsDto>> GetShortestRouteBetweenCitiesAsync(int startCityId, int destinationCityId, bool byAnyAirline)
+        public async Task<IEnumerable<FlightDetails>> GetShortestRouteBetweenCitiesAsync(int startCityId, int destinationCityId, bool byAnyAirline)
         {
             var startCity = await _flightDataContext.Cities
                 .Include(c => c.ArrivalFlights)
@@ -38,7 +38,7 @@ namespace FlightData.BLL.Services
                  .Include(c => c.ArrivalFlights)
                     .ThenInclude(f => f.Airline)
                 .Include(c => c.DepartureFlights)
-                    .ThenInclude(f => f.DestinationCity)                
+                    .ThenInclude(f => f.DestinationCity)
                 .Include(c => c.DepartureFlights)
                     .ThenInclude(f => f.Airline)
                 .SingleOrDefaultAsync(c => c.Id == startCityId);
@@ -64,7 +64,7 @@ namespace FlightData.BLL.Services
             var cities = await _cityServices.GetCitiesAsync();
             var airlines = await _airlineServices.GetAirlinesAsync();
 
-            List<FlightDetailsDto> details = new();
+            List<FlightDetails> details = new();
 
             if (!byAnyAirline)
             {
@@ -91,19 +91,19 @@ namespace FlightData.BLL.Services
             return details;
         }
 
-        private FlightDetailsDto ConstructFlightRoute(IEnumerable<City> cities, City startCity, City destCity, Airline? airline)
+        private FlightDetails ConstructFlightRoute(IEnumerable<City> cities, City startCity, City destCity, Airline? airline)
         {
             var currentCity = startCity;
             var visitedCityIds = new HashSet<int>();
             var unvisitedCities = cities.ToHashSet();
 
             // Key marks the city id, and the value is the shortest path generated from startCity
-            IDictionary<int, FlightDetailsDto> shortestFlightRoutesFromStart = new Dictionary<int, FlightDetailsDto>()
+            IDictionary<int, FlightDetails> shortestFlightRoutesFromStart = new Dictionary<int, FlightDetails>()
             {
-                { startCity.Id, new FlightDetailsDto { Airline = airline} }
+                { startCity.Id, new FlightDetails { Airline = airline} }
             };
 
-            FlightDetailsDto? currentCityShortestFlightDetails = new();
+            FlightDetails? currentCityShortestFlightDetails = new();
 
             while (unvisitedCities.Any())
             {
@@ -146,7 +146,7 @@ namespace FlightData.BLL.Services
 
                         if ((shortestDistanceRoute != null && newTotalDistance < shortestDistanceRoute.TotalDistance) || !currentShortestDistanceToCity)
                         {
-                            var flightPlan = new FlightDetailsDto
+                            var flightPlan = new FlightDetails
                             {
                                 Flights = currentCityShortestFlightDetails.Flights.ToList(),
                                 Airline = airline
@@ -159,7 +159,7 @@ namespace FlightData.BLL.Services
                 }
             }
 
-            return shortestFlightRoutesFromStart.TryGetValue(destCity.Id, out var result) ? result : new FlightDetailsDto { Airline = airline };
+            return shortestFlightRoutesFromStart.TryGetValue(destCity.Id, out var result) ? result : new FlightDetails { Airline = airline };
         }
     }
 }

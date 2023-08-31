@@ -1,5 +1,4 @@
-﻿using FlightData.BLL.DTOs;
-using FlightData.Model.Entities;
+﻿using FlightData.Model.Entities;
 
 namespace FlightData.BLL.Interfaces
 {

@@ -3,8 +3,6 @@ using FlightData.Model.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
-using System.Reflection.Metadata;
-
 namespace FlightData.DAL
 {
     public class FlightDataContext : DbContext

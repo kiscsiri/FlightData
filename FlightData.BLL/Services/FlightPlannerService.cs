@@ -49,10 +49,6 @@ namespace FlightData.BLL.Services
             }
 
             var destCity = await _flightDataContext.Cities
-                .Include(c => c.ArrivalFlights)
-                    .ThenInclude(f => f.StartCity)
-                .Include(c => c.DepartureFlights)
-                    .ThenInclude(f => f.DestinationCity)
                 .SingleOrDefaultAsync(c => c.Id == destinationCityId);
 
             if (destCity == null)
@@ -60,7 +56,6 @@ namespace FlightData.BLL.Services
                 throw new InvalidOperationException($"Can't find city with Id: [{destinationCityId}]");
             }
 
-            var allFlights = await _flightServices.GetFlightsAsync();
             var cities = await _cityServices.GetCitiesAsync();
             var airlines = await _airlineServices.GetAirlinesAsync();
 
